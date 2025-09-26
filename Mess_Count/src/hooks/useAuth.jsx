@@ -1,3 +1,4 @@
+// Frontend Auth Context (unchanged)
 import { BACKEND_URL } from "../utils/api";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 
@@ -66,7 +67,7 @@ export function AuthProvider({ children }) {
                 if (accessToken) {
                     try {
                         const response = await fetchWithAuth(
-                            `${BACKEND_URL}/api/get-role`
+                            `${BACKEND_URL}/api/auth/get-role`
                         );
 
                         if (response.ok) {
