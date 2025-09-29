@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
 
             try {
                 const refreshResponse = await fetch(
-                    `${BACKEND_URL}/api/refresh-token`,
+                    `${BACKEND_URL}/api/auth/refresh-token`,
                     {
                         method: "POST",
                         credentials: "include",

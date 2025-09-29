@@ -4,8 +4,6 @@ if (!BACKEND_URL || BACKEND_URL.length === 0) {
     throw new Error("VITE_BACKEND_URL environment variable is not set");
 }
 
-console.log("API initialized with BACKEND_URL:", BACKEND_URL);
-
 export async function api(endpoint, options = {}) {
     const url = `${BACKEND_URL}${endpoint}`;
     const response = await fetch(url, options);
