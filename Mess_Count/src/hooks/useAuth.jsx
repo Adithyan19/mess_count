@@ -1,4 +1,3 @@
-// Frontend Auth Context (unchanged)
 import { BACKEND_URL } from "../utils/api";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 
@@ -7,24 +6,15 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const refreshingRef = useRef(false);
+    const refreshPromiseRef = useRef(null);
+    const isInitializedRef = useRef(false);
 
-    const fetchWithAuth = async (url, options = {}) => {
-        let accessToken = localStorage.getItem("accessToken");
-        if (!accessToken) {
-            throw new Error("No access token");
+    const refreshAccessToken = async () => {
+        if (refreshPromiseRef.current) {
+            return refreshPromiseRef.current;
         }
 
-        options.headers = {
-            ...(options.headers || {}),
-            Authorization: `Bearer ${accessToken}`,
-        };
-
-        let response = await fetch(url, options);
-
-        if (response.status === 401 && !refreshingRef.current) {
-            refreshingRef.current = true;
-
+        refreshPromiseRef.current = (async () => {
             try {
                 const refreshResponse = await fetch(
                     `${BACKEND_URL}/api/auth/refresh-token`,
@@ -37,21 +27,48 @@ export function AuthProvider({ children }) {
                 if (refreshResponse.ok) {
                     const refreshData = await refreshResponse.json();
                     const newAccessToken = refreshData.accessToken;
-
                     localStorage.setItem("accessToken", newAccessToken);
-                    options.headers.Authorization = `Bearer ${newAccessToken}`;
-                    response = await fetch(url, options);
+                    return newAccessToken;
                 } else {
                     localStorage.removeItem("accessToken");
                     setUser(null);
                     throw new Error("Session expired");
                 }
-            } catch (refreshError) {
+            } catch (error) {
+                console.error("Refresh error:", error.message);
                 localStorage.removeItem("accessToken");
                 setUser(null);
-                throw new Error("Session expired");
+                throw error;
             } finally {
-                refreshingRef.current = false;
+                refreshPromiseRef.current = null;
+            }
+        })();
+
+        return refreshPromiseRef.current;
+    };
+
+    const fetchWithAuth = async (url, options = {}) => {
+        let accessToken = localStorage.getItem("accessToken");
+
+        if (!accessToken) {
+            throw new Error("No access token");
+        }
+
+        options.headers = {
+            ...(options.headers || {}),
+            Authorization: `Bearer ${accessToken}`,
+        };
+
+        let response = await fetch(url, options);
+
+        if (response.status === 401) {
+            try {
+                const newAccessToken = await refreshAccessToken();
+                options.headers.Authorization = `Bearer ${newAccessToken}`;
+                response = await fetch(url, options);
+            } catch (refreshError) {
+                console.error("Failed to refresh:", refreshError.message);
+                throw new Error("Session expired");
             }
         }
 
@@ -59,6 +76,11 @@ export function AuthProvider({ children }) {
     };
 
     useEffect(() => {
+        if (isInitializedRef.current) {
+            return;
+        }
+        isInitializedRef.current = true;
+
         const initializeAuth = async () => {
             try {
                 const accessToken = localStorage.getItem("accessToken");
@@ -77,6 +99,10 @@ export function AuthProvider({ children }) {
                             setUser(null);
                         }
                     } catch (error) {
+                        console.error(
+                            "Auth initialization error:",
+                            error.message
+                        );
                         localStorage.removeItem("accessToken");
                         setUser(null);
                     }
@@ -84,6 +110,7 @@ export function AuthProvider({ children }) {
                     setUser(null);
                 }
             } catch (error) {
+                console.error("Outer auth error:", error.message);
                 setUser(null);
             } finally {
                 setLoading(false);
@@ -138,7 +165,9 @@ export function AuthProvider({ children }) {
                 method: "POST",
                 credentials: "include",
             });
-        } catch (error) {}
+        } catch (error) {
+            console.log("Logout error:", error);
+        }
     };
 
     const contextValue = {
