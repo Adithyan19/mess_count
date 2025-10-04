@@ -11,7 +11,6 @@ export function AuthProvider({ children }) {
 
     const fetchWithAuth = async (url, options = {}) => {
         let accessToken = localStorage.getItem("accessToken");
-
         if (!accessToken) {
             throw new Error("No access token");
         }
