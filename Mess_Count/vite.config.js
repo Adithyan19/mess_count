@@ -10,11 +10,11 @@ export default defineConfig({
         tailwindcss(),
         VitePWA({
             registerType: "autoUpdate",
-            injectRegister: false,
+            injectRegister: "auto",
 
             pwaAssets: {
                 disabled: false,
-                config: true,
+                config: false,
             },
 
             manifest: {
