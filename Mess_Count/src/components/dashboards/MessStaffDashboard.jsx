@@ -19,7 +19,7 @@ export default function MessStaffDashboard() {
         async function loadHostels() {
             try {
                 const res = await fetchWithAuth(
-                    `${BACKEND_URL}/api/auth/hostels`
+                    `${BACKEND_URL}/api/user/hostels`
                 );
                 const data = await res.json();
                 console.log(data);
@@ -134,7 +134,7 @@ export default function MessStaffDashboard() {
         setError("");
 
         try {
-            const res = await fetchWithAuth(`${BACKEND_URL}/api/auth/scanQr`, {
+            const res = await fetchWithAuth(`${BACKEND_URL}/api/user/scanQr`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

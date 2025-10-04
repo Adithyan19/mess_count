@@ -11,7 +11,7 @@ export default function StudentDashboard() {
 
     useEffect(() => {
         if (!user) return;
-        fetchWithAuth(`${BACKEND_URL}/api/auth/getQrCode`, {
+        fetchWithAuth(`${BACKEND_URL}/api/user/getQrCode`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
