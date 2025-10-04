@@ -2,7 +2,7 @@
 import React from "react";
 import { UserPlus, Users, ChefHat, BarChart3 } from "lucide-react";
 
-export default function SuperAdminDashboard({ activeRoute }) {
+function SuperAdminDashboard({ activeRoute }) {
     let content;
     switch (activeRoute) {
         case "/create-admin":
@@ -202,3 +202,5 @@ export default function SuperAdminDashboard({ activeRoute }) {
     }
     return content;
 }
+
+export default SuperAdminDashboard;

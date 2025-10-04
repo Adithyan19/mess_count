@@ -1,6 +1,6 @@
 import { useAuth } from "../../hooks/useAuth.jsx";
 
-export default function Header() {
+function Header() {
     const { logout } = useAuth();
 
     return (
@@ -15,3 +15,5 @@ export default function Header() {
         </header>
     );
 }
+
+export default Header;

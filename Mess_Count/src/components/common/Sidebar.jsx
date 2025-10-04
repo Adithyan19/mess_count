@@ -1,13 +1,7 @@
 import { X, LogOut } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.jsx";
 
-export default function Sidebar({
-    navItems,
-    isOpen,
-    onClose,
-    activeRoute,
-    onRouteChange,
-}) {
+function Sidebar({ navItems, isOpen, onClose, activeRoute, onRouteChange }) {
     const { user, logout } = useAuth();
 
     const getAccentColor = () => {
@@ -89,3 +83,4 @@ export default function Sidebar({
         </aside>
     );
 }
+export default Sidebar;

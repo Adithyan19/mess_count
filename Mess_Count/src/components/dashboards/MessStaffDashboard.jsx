@@ -3,7 +3,7 @@ import { BrowserMultiFormatReader } from "@zxing/browser";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { BACKEND_URL } from "../../utils/api.js";
 
-export default function MessStaffDashboard() {
+function MessStaffDashboard() {
     const { user, fetchWithAuth } = useAuth();
     const videoRef = useRef(null);
     const codeReaderRef = useRef(null);
@@ -242,3 +242,5 @@ export default function MessStaffDashboard() {
         </div>
     );
 }
+
+export default MessStaffDashboard;

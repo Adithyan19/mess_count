@@ -2,7 +2,7 @@
 import React from "react";
 import { BarChart3, UtensilsCrossed, UserPlus, Clock } from "lucide-react";
 
-export default function AdminDashboard({ activeRoute }) {
+function AdminDashboard({ activeRoute }) {
     let content;
     switch (activeRoute) {
         case "/food-count":
@@ -167,3 +167,5 @@ export default function AdminDashboard({ activeRoute }) {
     }
     return content;
 }
+
+export default AdminDashboard;

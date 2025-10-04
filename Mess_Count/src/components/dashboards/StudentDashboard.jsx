@@ -3,7 +3,7 @@ import QRCode from "react-qr-code";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { BACKEND_URL } from "../../utils/api.js";
 
-export default function StudentDashboard() {
+function StudentDashboard() {
     const { user, fetchWithAuth } = useAuth();
     const [qrCode, setQrCode] = useState("");
     const [loading, setLoading] = useState(true);
@@ -96,3 +96,5 @@ export default function StudentDashboard() {
         </div>
     );
 }
+
+export default StudentDashboard;

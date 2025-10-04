@@ -6,7 +6,7 @@ import MessStaffDashboard from "../dashboards/MessStaffDashboard.jsx";
 import AdminDashboard from "../dashboards/AdminDashboard.jsx";
 import SuperAdminDashboard from "../dashboards/SuperAdminDashboard.jsx";
 
-export default function Layout() {
+function Layout() {
     const { user, loading } = useAuth();
 
     if (loading || !user) {
@@ -47,3 +47,4 @@ export default function Layout() {
         </div>
     );
 }
+export default Layout;
