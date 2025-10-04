@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import QRCode from "react-qr-code";
-import { useAuth } from "../../hooks/useAuth";
-import { BACKEND_URL } from "../../utils/api";
+import { useAuth } from "../../hooks/useAuth.jsx";
+import { BACKEND_URL } from "../../utils/api.js";
 
 export default function StudentDashboard() {
     const { user, fetchWithAuth } = useAuth();

@@ -1,4 +1,4 @@
-import { BACKEND_URL } from "../utils/api";
+import { BACKEND_URL } from "../utils/api.js";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 
 const AuthContext = createContext();

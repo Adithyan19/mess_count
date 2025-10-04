@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
-import Header from "../common/Header";
-import StudentDashboard from "../dashboards/StudentDashboard";
-import MessStaffDashboard from "../dashboards/MessStaffDashboard";
-import AdminDashboard from "../dashboards/AdminDashboard";
-import SuperAdminDashboard from "../dashboards/SuperAdminDashboard";
+import { useAuth } from "../../hooks/useAuth.jsx";
+import Header from "../common/Header.jsx";
+import StudentDashboard from "../dashboards/StudentDashboard.jsx";
+import MessStaffDashboard from "../dashboards/MessStaffDashboard.jsx";
+import AdminDashboard from "../dashboards/AdminDashboard.jsx";
+import SuperAdminDashboard from "../dashboards/SuperAdminDashboard.jsx";
 
 export default function Layout() {
     const { user, loading } = useAuth();

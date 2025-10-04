@@ -1,5 +1,5 @@
 import { X, LogOut } from "lucide-react";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth.jsx";
 
 export default function Sidebar({
     navItems,
