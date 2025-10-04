@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth, AuthProvider } from "./hooks/useAuth";
 import Layout from "./components/layout/Layout";
-import { Login } from "./components/auth/login";
+import Login from "./components/auth/login";
 
 function AppContent() {
     const { user, loading } = useAuth();
