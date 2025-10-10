@@ -18,6 +18,9 @@ export default defineConfig({
             },
 
             manifest: {
+                strategies: "injectManifest",
+                srcDir: "src",
+                filename: "sw.js",
                 name: "Mess_Count",
                 short_name: "Mess_Count",
                 description: "mess_count_web_application",

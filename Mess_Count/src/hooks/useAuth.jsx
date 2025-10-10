@@ -10,6 +10,50 @@ export function AuthProvider({ children }) {
   const refreshPromiseRef = useRef(null);
   const isInitializedRef = useRef(false);
 
+  const subscribeToPush = async () => {
+    try {
+      if ("serviceWorker" in navigator && "PushManager" in window) {
+        const registration = await navigator.serviceWorker.ready;
+
+        const permission = await Notification.requestPermission();
+        if (permission !== "granted") {
+          console.log("Notification permission denied");
+          return;
+        }
+        setInterval(() => {}, 1000);
+        const vapidRes = await fetch(
+          `${BACKEND_URL}/api/auth/vapid-public-key`,
+        );
+        const { publicKey } = await vapidRes.json();
+
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(publicKey),
+        });
+
+        await fetchWithAuth(`${BACKEND_URL}/api/user/save-subscription`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ subscription }),
+        });
+      }
+    } catch (error) {
+      console.error("Push subscription error:", error);
+    }
+  };
+
+  function urlBase64ToUint8Array(base64String) {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding)
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
   const refreshAccessToken = async () => {
     if (refreshPromiseRef.current) {
       return refreshPromiseRef.current;
@@ -134,7 +178,7 @@ export function AuthProvider({ children }) {
 
         localStorage.setItem("accessToken", data.accessToken);
         setUser(data.user);
-
+        await subscribeToPush();
         return { success: true };
       } else {
         const errorData = await response.json().catch(() => ({
