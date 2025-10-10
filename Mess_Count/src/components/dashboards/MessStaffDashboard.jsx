@@ -150,7 +150,11 @@ function MessStaffDashboard() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-xl shadow-lg p-6">
+      <div
+        className={`rounded-xl shadow-lg p-6 transition-all duration-300 ${
+          error ? "bg-red-500 border border-red-400" : "bg-white"
+        }`}
+      >
         <div className="mb-6">
           <label className="block font-medium mb-2 text-gray-700">
             Select Hostel
@@ -173,7 +177,7 @@ function MessStaffDashboard() {
               </option>
             ))}
           </select>
-          {error && <p className="mt-2 text-red-500">{error}</p>}
+          {error && <p className="mt-2 text-amber-50">{error}</p>}
         </div>
 
         {selectedHostelId && (
@@ -199,18 +203,18 @@ function MessStaffDashboard() {
               <div className="bg-gray-50 p-4 rounded-lg">
                 {scannedUser ? (
                   <>
-                    <p className="text-gray-800">
+                    <p className="text-green-600">
                       <span className="font-medium">Name:</span>{" "}
                       {scannedUser.name}
                     </p>
-                    <p className="text-gray-800">
+                    <p className="text-green-600">
                       <span className="font-medium">Admission No:</span>{" "}
                       {scannedUser.admission_no}
                     </p>
-                    <p className="text-gray-800">
+                    <p className="text-green-600">
                       <span className="font-medium">Hostel:</span>{" "}
                       {
-                        hostels.find((h) => h.hostel_id === selectedHostelId)
+                        hostels.find((h) => h.hostel_id == selectedHostelId)
                           ?.hostel_name
                       }
                     </p>
