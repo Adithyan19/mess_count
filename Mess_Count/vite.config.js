@@ -9,6 +9,9 @@ export default defineConfig({
         react(),
         tailwindcss(),
         VitePWA({
+            strategies: "injectManifest",
+            srcDir: "src",
+            filename: "sw.js",
             registerType: "autoUpdate",
             injectRegister: "auto",
 
@@ -18,9 +21,6 @@ export default defineConfig({
             },
 
             manifest: {
-                strategies: "injectManifest",
-                srcDir: "src",
-                filename: "sw.js",
                 name: "Mess_Count",
                 short_name: "Mess_Count",
                 description: "mess_count_web_application",
