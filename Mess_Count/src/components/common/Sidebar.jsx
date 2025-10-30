@@ -36,7 +36,6 @@ const navigationByRole = {
   SUPER_ADMIN: [
     { title: "Dashboard", url: "/super-admin", icon: Home },
     { title: "All Users", url: "/super-admin/users", icon: Users },
-    { title: "System Settings", url: "/super-admin/settings", icon: Settings },
     { title: "Audit Logs", url: "/super-admin/attendance", icon: BookOpen },
   ],
 };
