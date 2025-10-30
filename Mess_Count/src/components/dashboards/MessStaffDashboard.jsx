@@ -7,20 +7,20 @@ function MessStaffDashboard() {
   const { user, fetchWithAuth } = useAuth();
   const videoRef = useRef(null);
   const codeReaderRef = useRef(null);
-  const streamRef = useRef(null);
+  const controlsRef = useRef(null);
   const [hostels, setHostels] = useState([]);
   const [selectedHostelId, setSelectedHostelId] = useState("");
   const [scannerActive, setScannerActive] = useState(false);
   const [scannedUser, setScannedUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const lastScanTimeRef = useRef(0);
 
   useEffect(() => {
     async function loadHostels() {
       try {
         const res = await fetchWithAuth(`${BACKEND_URL}/api/user/hostels`);
         const data = await res.json();
-        console.log(data);
         if (res.ok) setHostels(data.hostels);
         else setError(data.message || "Failed to load hostels");
       } catch {
@@ -33,17 +33,61 @@ function MessStaffDashboard() {
     };
   }, [fetchWithAuth]);
 
+  useEffect(() => {
+    if (!user) {
+      stopScanner();
+      setScannerActive(false);
+      setSelectedHostelId("");
+      setScannedUser(null);
+      setError("");
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (scannerActive) {
+          stopScanner();
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [scannerActive]);
+
+  useEffect(() => {
+    const handleBlur = () => {
+      if (scannerActive) {
+        stopScanner();
+      }
+    };
+
+    const handlePageHide = () => {
+      stopScanner();
+    };
+
+    window.addEventListener("blur", handleBlur);
+    document.addEventListener("pagehide", handlePageHide);
+    return () => {
+      window.removeEventListener("blur", handleBlur);
+      document.removeEventListener("pagehide", handlePageHide);
+    };
+  }, [scannerActive]);
+
   const stopScanner = () => {
     try {
+      if (controlsRef.current) {
+        controlsRef.current.stop();
+        controlsRef.current = null;
+      }
       if (codeReaderRef.current) {
-        codeReaderRef.current.reset();
         codeReaderRef.current = null;
       }
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((t) => t.stop());
-        streamRef.current = null;
-      }
       if (videoRef.current) {
+        videoRef.current.pause();
         videoRef.current.srcObject = null;
       }
       setScannerActive(false);
@@ -54,58 +98,61 @@ function MessStaffDashboard() {
 
   const handleHostelChange = (e) => {
     const newHostelId = e.target.value;
-
-    if (scannerActive) {
-      stopScanner();
-    }
+    if (scannerActive) stopScanner();
 
     setScannedUser(null);
     setError("");
     setLoading(false);
-
     setSelectedHostelId(newHostelId);
+  };
 
-    if (newHostelId) {
+  const toggleScanner = () => {
+    if (scannerActive) {
+      stopScanner();
+    } else if (selectedHostelId) {
       setScannerActive(true);
+    } else {
+      setError("Please select a hostel first.");
+      setTimeout(() => setError(""), 2000);
     }
   };
 
   useEffect(() => {
     if (!scannerActive || !selectedHostelId) return;
-
     let isActive = true;
 
     async function initScanner() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
-        });
-
-        if (!isActive) {
-          stream.getTracks().forEach((t) => t.stop());
-          return;
-        }
-
-        streamRef.current = stream;
-
         if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
-
-          if (!isActive) {
-            stopScanner();
-            return;
-          }
-
-          const codeReader = new BrowserMultiFormatReader();
-          codeReaderRef.current = codeReader;
-
-          codeReader.decodeFromVideoElement(videoRef.current, (result, err) => {
-            if (result && isActive) {
-              handleQrScan(result.getText());
-            }
-          });
+          videoRef.current.srcObject = null;
         }
+
+        if (!isActive) return;
+
+        const codeReader = new BrowserMultiFormatReader();
+        codeReaderRef.current = codeReader;
+
+        const constraints = {
+          video: { facingMode: "environment" },
+        };
+
+        const controls = await codeReader.decodeFromConstraints(
+          constraints,
+          videoRef.current,
+          (result, err) => {
+            if (err && err.name !== "NotFoundException2") {
+              console.error("Decode error:", err);
+            }
+            if (result && isActive) {
+              const now = Date.now();
+              if (now - lastScanTimeRef.current > 1500 && !loading) {
+                lastScanTimeRef.current = now;
+                handleQrScan(result.getText());
+              }
+            }
+          },
+        );
+        controlsRef.current = controls;
       } catch (e) {
         console.error("Camera error:", e);
         if (isActive) {
@@ -116,7 +163,6 @@ function MessStaffDashboard() {
     }
 
     initScanner();
-
     return () => {
       isActive = false;
       stopScanner();
@@ -132,10 +178,7 @@ function MessStaffDashboard() {
       const res = await fetchWithAuth(`${BACKEND_URL}/api/user/scanQr`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          qrCode,
-          currentHostelId: selectedHostelId,
-        }),
+        body: JSON.stringify({ qrCode, currentHostelId: selectedHostelId }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Scan failed");
@@ -143,6 +186,7 @@ function MessStaffDashboard() {
     } catch (err) {
       setError(err.message);
       setScannedUser(null);
+      setTimeout(() => setError(""), 2000);
     } finally {
       setLoading(false);
     }
@@ -191,6 +235,16 @@ function MessStaffDashboard() {
                   playsInline
                 />
               </div>
+              <button
+                onClick={toggleScanner}
+                className={`mt-4 px-6 py-2 rounded-lg font-medium transition-colors ${
+                  scannerActive
+                    ? "bg-red-500 hover:bg-red-600 text-white"
+                    : "bg-green-500 hover:bg-green-600 text-white"
+                }`}
+              >
+                {scannerActive ? "Stop Scanner" : "Start Scanner"}
+              </button>
               {loading && (
                 <p className="mt-2 text-blue-500">Processing QR code...</p>
               )}
@@ -220,7 +274,7 @@ function MessStaffDashboard() {
                     </p>
                   </>
                 ) : (
-                  <p className="text-gray-500"></p>
+                  <p className="text-gray-500 ">Scan a QR</p>
                 )}
               </div>
             </div>
