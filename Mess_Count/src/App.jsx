@@ -1,10 +1,12 @@
-import React from "react";
-import { useAuth, AuthProvider } from "./hooks/useAuth.jsx";
-import Layout from "./components/layout/Layout.jsx";
+import { useRoutes } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
+import { AuthProvider, useAuth } from "./hooks/useAuth.jsx";
+import { routes } from "./routes/routes.jsx";
 import Login from "./components/auth/login.jsx";
 
 function AppContent() {
   const { user, loading } = useAuth();
+  const routeElements = useRoutes(routes);
 
   if (loading) {
     return (
@@ -15,18 +17,18 @@ function AppContent() {
     );
   }
 
-  if (!user) {
-    return <Login />;
-  }
+  if (!user) return <Login />;
 
-  return <Layout />;
+  return routeElements;
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

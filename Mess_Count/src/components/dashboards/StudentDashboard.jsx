@@ -55,7 +55,7 @@ function StudentDashboard() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+      <div className="border-2 border-blue-600 bg-white rounded-xl shadow-lg p-4 sm:p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex items-center justify-center">
             <div className="inline-block bg-white p-3 sm:p-4 rounded-lg shadow-md">
@@ -74,7 +74,7 @@ function StudentDashboard() {
             <h3 className="text-xl sm:text-2xl font-semibold text-gray-800">
               Student Details
             </h3>
-            <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+            <div className="bg-gray-100 p-4 rounded-lg space-y-3">
               <p className="text-gray-800 break-words">
                 <span className="font-medium">Name:</span> {user.name}
               </p>

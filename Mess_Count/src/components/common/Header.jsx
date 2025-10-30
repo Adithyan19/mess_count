@@ -1,14 +1,24 @@
 import { useAuth } from "../../hooks/useAuth.jsx";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 function Header() {
   const { logout } = useAuth();
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-16 bg-white shadow z-40 flex items-center justify-between px-4">
-      <h1 className="text-xl font-bold">Mess Count</h1>
-      <button onClick={logout} className="text-sm text-red-600 hover:underline">
+    <header className="h-16 bg-white shadow flex items-center justify-between px-4 gap-2 border-b">
+      <div className="flex items-center gap-2">
+        <SidebarTrigger />
+        <Separator orientation="vertical" className="h-4" />
+        <h1 className="text-xl font-bold">Mess Count</h1>
+      </div>
+      <Button
+        onClick={logout}
+        className="text-sm text-red-600 hover:text-white"
+      >
         Logout
-      </button>
+      </Button>
     </header>
   );
 }

@@ -1,6 +1,4 @@
-// src/dashboards/AdminDashboard.jsx
 import React, { useState, useEffect } from "react";
-import { BarChart3, UtensilsCrossed, UserPlus, Clock } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import Papa from "papaparse";
 
@@ -32,7 +30,7 @@ function AdminDashboard() {
       );
       if (res.ok) {
       } else {
-        console.log("SCv upload failed");
+        console.log("CSV upload failed");
       }
     } catch (error) {
       console.error("Error uploading CSV:", error);

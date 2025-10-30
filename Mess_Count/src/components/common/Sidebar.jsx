@@ -1,83 +1,93 @@
-import { X, LogOut } from "lucide-react";
+import * as React from "react";
+import { Link } from "react-router-dom";
+import { BookOpen, Home, Users, Settings, Vote, BarChart } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth.jsx";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+} from "@/components/ui/sidebar";
 
-function Sidebar({ navItems, isOpen, onClose, activeRoute, onRouteChange }) {
-  const { user, logout } = useAuth();
+const navigationByRole = {
+  STUDENT: [
+    { title: "Home", url: "/student", icon: Home },
+    { title: "My Meals", url: "/student/meals", icon: BookOpen },
+  ],
+  MESS_STAFF: [
+    { title: "Home", url: "/staff", icon: Home },
+    { title: "Count", url: "/staff/count", icon: BookOpen },
+  ],
+  STUDENT_REP: [
+    { title: "Home", url: "/rep", icon: Home },
+    { title: "My Meals", url: "/rep/meals", icon: BookOpen },
+    { title: "Add Polls", url: "/rep/poll", icon: Vote },
+    { title: "Poll Results", url: "/rep/results", icon: BarChart },
+  ],
+  ADMIN: [
+    { title: "Dashboard", url: "/admin", icon: Home },
+    { title: "Users", url: "/admin/users", icon: Users },
+    { title: "Attendance", url: "/admin/attendance", icon: BookOpen },
+  ],
+  SUPER_ADMIN: [
+    { title: "Dashboard", url: "/super-admin", icon: Home },
+    { title: "All Users", url: "/super-admin/users", icon: Users },
+    { title: "System Settings", url: "/super-admin/settings", icon: Settings },
+    { title: "Audit Logs", url: "/super-admin/attendance", icon: BookOpen },
+  ],
+};
 
-  const getAccentColor = () => {
-    switch (user?.role.toLowerCase()) {
-      case "super_admin":
-        return "purple";
-      case "admin":
-        return "blue";
-      case "mess_staff":
-        return "green";
-      case "student":
-        return "orange";
-      default:
-        return "blue";
-    }
-  };
+export function AppSidebar() {
+  const { user } = useAuth();
 
-  const accentColor = getAccentColor();
-  const prettyRole = user?.role?.replace(/_/g, " ").toLowerCase();
+  if (!user) return null;
+
+  const navItems = navigationByRole[user.role] || [];
 
   return (
-    <aside
-      className={`
-        fixed top-16 left-0 z-30 w-64 h-[calc(100vh-4rem)] bg-white shadow-lg
-        transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0
-      `}
-    >
-      {/* Mobile close button */}
-      <div className="flex items-center justify-between p-4 border-b lg:hidden">
-        <h3 className="font-semibold text-gray-800">Menu</h3>
-        <button onClick={onClose} className="p-1 rounded-md hover:bg-gray-100">
-          <X size={20} />
-        </button>
-      </div>
+    <Sidebar>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <Link to="/">
+                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <Users className="size-4" />
+                </div>
+                <div className="flex flex-col gap-0.5 leading-none">
+                  <span className="font-semibold">{user.name}</span>
+                  <span className="text-xs text-gray-500 capitalize">
+                    {user.role.toLowerCase().replace("_", " ")}
+                  </span>
+                </div>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
 
-      {/* Navigation Items */}
-      <nav className="mt-4 lg:mt-0 flex-1 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.path}
-              onClick={() => {
-                onRouteChange(item.path);
-                onClose();
-              }}
-              className={`
-                w-full flex items-center px-6 py-3 text-left
-                transition-colors duration-200
-                ${
-                  activeRoute === item.path
-                    ? `bg-${accentColor}-100 text-${accentColor}-700 border-l-4 border-${accentColor}-500`
-                    : "text-gray-700 hover:bg-gray-100"
-                }
-              `}
-            >
-              <Icon className="mr-3 h-5 w-5" />
-              <span className="font-medium">{item.name}</span>
-            </button>
-          );
-        })}
-      </nav>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarMenu>
+            {navItems.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild>
+                  <Link to={item.url} className="flex items-center gap-2">
+                    <item.icon className="size-4" />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
 
-      {/* User info and logout at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-gray-50">
-        <button
-          onClick={logout}
-          className="w-full flex items-center px-4 py-3 text-left text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-        >
-          <LogOut className="mr-3 h-5 w-5" />
-          Logout
-        </button>
-      </div>
-    </aside>
+      <SidebarRail />
+    </Sidebar>
   );
 }
-export default Sidebar;

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth.jsx";
-// import Header from "../common/Header";
 
 function Login() {
   const [email, setEmail] = useState("");

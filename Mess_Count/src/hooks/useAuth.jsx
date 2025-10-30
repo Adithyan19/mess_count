@@ -1,4 +1,3 @@
-// todo: lear about zod and check whether it can be implemented in this?
 import { BACKEND_URL } from "../utils/api.js";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 
