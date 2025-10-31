@@ -17,6 +17,7 @@ const navigationByRole = {
   STUDENT: [
     { title: "Home", url: "/student", icon: Home },
     { title: "My Meals", url: "/student/meals", icon: BookOpen },
+    { title: "Vote", url: "/student/vote", icon: Vote },
   ],
   MESS_STAFF: [
     { title: "Home", url: "/staff", icon: Home },
@@ -25,6 +26,7 @@ const navigationByRole = {
   STUDENT_REP: [
     { title: "Home", url: "/rep", icon: Home },
     { title: "My Meals", url: "/rep/meals", icon: BookOpen },
+    { title: "Vote", url: "/rep/vote", icon: Vote },
     { title: "Add Polls", url: "/rep/poll", icon: Vote },
     { title: "Poll Results", url: "/rep/results", icon: BarChart },
   ],

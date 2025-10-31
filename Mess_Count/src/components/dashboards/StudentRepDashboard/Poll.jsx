@@ -64,13 +64,8 @@ export default function Poll() {
     setOptions(["", ""]);
   };
 
-  const deletePoll = (id) => {
-    setPolls(polls.filter((poll) => poll.id !== id));
-  };
-
   return (
-    //TODO: Remove the border color
-    <div className="flex justify-center mx-auto px-4 py-6 sm:px-6 lg:px-8 border-4 border-amber-700">
+    <div className="flex justify-center mx-auto px-4 py-6 sm:px-6 lg:px-8">
       <div className="w-full max-w-5xl border-blue-600 border-2 rounded-xl shadow-lg p-4 sm:p-6">
         <div className="flex flex-wrap items-center gap-2 mb-6 text-center sm:text-left">
           <Vote className="size-6 shrink-0 mx-auto sm:mx-0" />

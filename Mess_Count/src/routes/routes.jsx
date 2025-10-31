@@ -6,7 +6,7 @@ import MessStaffDashboard from "../components/dashboards/MessStaffDashboard";
 import AdminDashboard from "../components/dashboards/AdminDashboard";
 import SuperAdminDashboard from "../components/dashboards/SuperAdminDashboard";
 import Login from "../components/auth/login";
-
+import Vote from "../components/dashboards/StudentDashboard/Vote";
 import MyMeals from "../components/dashboards/StudentDashboard/MyMeals";
 import Poll from "../components/dashboards/StudentRepDashboard/Poll";
 import Result from "../components/dashboards/StudentRepDashboard/Result";
@@ -41,6 +41,14 @@ export const routes = [
         ),
       },
       {
+        path: "student/vote",
+        element: (
+          <ProtectedRoute allowedRoles={["STUDENT"]}>
+            <Vote />
+          </ProtectedRoute>
+        ),
+      },
+      {
         path: "rep",
         element: (
           <ProtectedRoute allowedRoles={["STUDENT_REP"]}>
@@ -53,6 +61,14 @@ export const routes = [
         element: (
           <ProtectedRoute allowedRoles={["STUDENT_REP"]}>
             <MyMeals />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "rep/vote",
+        element: (
+          <ProtectedRoute allowedRoles={["STUDENT_REP"]}>
+            <Vote />
           </ProtectedRoute>
         ),
       },
