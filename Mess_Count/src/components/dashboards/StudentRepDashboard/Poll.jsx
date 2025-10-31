@@ -7,7 +7,6 @@ export default function Poll() {
   const { user, loading, fetchWithAuth } = useAuth();
   const [options, setOptions] = useState(["", ""]);
   const [error, setError] = useState("");
-  const [polls, setPolls] = useState([]);
   const [title, setTitle] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -60,15 +59,13 @@ export default function Poll() {
         })),
       };
 
-      const response = await fetchWithAuth(`${BACKEND_URL}/api/poll/create`, {
+      const response = await fetchWithAuth(`${BACKEND_URL}/api/polls/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(pollData),
       });
 
       if (response.ok) {
-        const newPoll = await response.json();
-        setPolls([newPoll, ...polls]);
         setTitle("");
         setOptions(["", ""]);
       } else {
