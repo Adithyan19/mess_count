@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import { Vote, Trash2, Plus } from "lucide-react";
+import { BACKEND_URL } from "../../../utils/api.js";
 
 export default function Poll() {
-  const { user, loading } = useAuth();
+  const { user, loading, fetchWithAuth } = useAuth();
   const [options, setOptions] = useState(["", ""]);
   const [error, setError] = useState("");
   const [polls, setPolls] = useState([]);
   const [title, setTitle] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (loading) {
     return (
@@ -33,7 +35,7 @@ export default function Poll() {
     setOptions(newOptions);
   };
 
-  const handleCreatePoll = () => {
+  const handleCreatePoll = async () => {
     setError("");
 
     if (!title.trim()) {
@@ -47,21 +49,40 @@ export default function Poll() {
       return;
     }
 
-    const newPoll = {
-      id: Date.now(),
-      title,
-      options: filledOptions.map((opt) => ({
-        text: opt,
-        votes: 0,
-      })),
-      createdBy: user?.name,
-      createdAt: new Date().toLocaleDateString(),
-    };
+    setIsSubmitting(true);
 
-    setPolls([newPoll, ...polls]);
+    try {
+      const pollData = {
+        title,
+        options: filledOptions.map((opt) => ({
+          text: opt,
+          votes: 0,
+        })),
+      };
 
-    setTitle("");
-    setOptions(["", ""]);
+      const response = await fetchWithAuth(`${BACKEND_URL}/api/poll/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pollData),
+      });
+
+      if (response.ok) {
+        const newPoll = await response.json();
+        setPolls([newPoll, ...polls]);
+        setTitle("");
+        setOptions(["", ""]);
+      } else {
+        const errorData = await response.json().catch(() => ({
+          message: "Failed to create poll",
+        }));
+        setError(errorData.message || "Failed to create poll");
+      }
+    } catch (err) {
+      setError(err.message);
+      console.error("Poll creation error:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -88,6 +109,7 @@ export default function Poll() {
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter the title"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSubmitting}
           />
         </div>
         <div className="mb-4">
@@ -103,11 +125,13 @@ export default function Poll() {
                   onChange={(e) => updateOption(index, e.target.value)}
                   placeholder={`Option ${index + 1}`}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
+                  disabled={isSubmitting}
                 />
                 {options.length > 2 && (
                   <button
                     onClick={() => removeOption(index)}
-                    className="px-3 py-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition mb-3  "
+                    className="px-3 py-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition mb-3"
+                    disabled={isSubmitting}
                   >
                     <Trash2 className="size-4" />
                   </button>
@@ -118,7 +142,8 @@ export default function Poll() {
           {options.length < 6 && (
             <button
               onClick={addOption}
-              className="mt-3 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition font-medium"
+              className="mt-3 flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition font-medium disabled:opacity-50"
+              disabled={isSubmitting}
             >
               <Plus className="size-4" />
               Add Option
@@ -127,9 +152,10 @@ export default function Poll() {
         </div>
         <button
           onClick={handleCreatePoll}
-          className="w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+          disabled={isSubmitting}
+          className="w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition disabled:bg-blue-400 disabled:cursor-not-allowed"
         >
-          Create Poll
+          {isSubmitting ? "Creating..." : "Create Poll"}
         </button>
       </div>
     </div>

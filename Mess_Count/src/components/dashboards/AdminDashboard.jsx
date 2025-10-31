@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import Papa from "papaparse";
+import { BACKEND_URL } from "../../utils/api.js";
 
 function AdminDashboard() {
   const { user, fetchWithAuth } = useAuth();
@@ -21,13 +22,10 @@ function AdminDashboard() {
     formData.append("file", selectedFile);
 
     try {
-      const res = await fetchWithAuth(
-        `${import.meta.env.VITE_BACKEND_URL}/api/upload-csv`,
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
+      const res = await fetchWithAuth(`${BACKEND_URL}/api/upload-csv`, {
+        method: "POST",
+        body: formData,
+      });
       if (res.ok) {
       } else {
         console.log("CSV upload failed");
