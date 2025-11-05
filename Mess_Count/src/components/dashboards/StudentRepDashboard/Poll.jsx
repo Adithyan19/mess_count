@@ -8,6 +8,7 @@ export default function Poll() {
   const [options, setOptions] = useState(["", ""]);
   const [error, setError] = useState("");
   const [title, setTitle] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (loading) {
@@ -48,26 +49,34 @@ export default function Poll() {
       return;
     }
 
+    if (!endTime) {
+      setError("Please set an end time for the poll");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const pollData = {
-        title,
-        options: filledOptions.map((opt) => ({
-          text: opt,
-          votes: 0,
-        })),
+      const payload = {
+        pollData: {
+          title,
+          options: filledOptions.map((opt) => ({
+            text: opt,
+          })),
+        },
+        end_time: endTime,
       };
 
-      const response = await fetchWithAuth(`${BACKEND_URL}/api/polls/create`, {
+      const response = await fetchWithAuth(`${BACKEND_URL}/api/user/addpolls`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(pollData),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
         setTitle("");
         setOptions(["", ""]);
+        setEndTime("");
       } else {
         const errorData = await response.json().catch(() => ({
           message: "Failed to create poll",
@@ -99,7 +108,9 @@ export default function Poll() {
         )}
 
         <div className="mb-4">
-          <label className="text-black font-semibold text-lg mb-3">Title</label>
+          <label className="text-black font-semibold text-lg mb-3 block">
+            Title
+          </label>
           <input
             type="text"
             value={title}
@@ -109,25 +120,39 @@ export default function Poll() {
             disabled={isSubmitting}
           />
         </div>
+
         <div className="mb-4">
-          <label className="text-lg font-semibold text-black mb-3">
+          <label className="text-black font-semibold text-lg mb-3 block">
+            Poll End Time
+          </label>
+          <input
+            type="datetime-local"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isSubmitting}
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="text-lg font-semibold text-black mb-3 block">
             Options
           </label>
           <div>
             {options.map((option, index) => (
-              <div key={index} className="flex gap-2">
+              <div key={index} className="flex gap-2 mb-3">
                 <input
                   type="text"
                   value={option}
                   onChange={(e) => updateOption(index, e.target.value)}
                   placeholder={`Option ${index + 1}`}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   disabled={isSubmitting}
                 />
                 {options.length > 2 && (
                   <button
                     onClick={() => removeOption(index)}
-                    className="px-3 py-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition mb-3"
+                    className="px-3 py-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition"
                     disabled={isSubmitting}
                   >
                     <Trash2 className="size-4" />
@@ -147,6 +172,7 @@ export default function Poll() {
             </button>
           )}
         </div>
+
         <button
           onClick={handleCreatePoll}
           disabled={isSubmitting}

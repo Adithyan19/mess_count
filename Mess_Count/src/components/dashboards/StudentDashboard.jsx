@@ -6,12 +6,13 @@ import { BACKEND_URL } from "../../utils/api.js";
 function StudentDashboard() {
   const { user, fetchWithAuth } = useAuth();
   const [qrCode, setQrCode] = useState("");
+  const [hostel_name, setHostelName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!user) return;
-    fetchWithAuth(`${BACKEND_URL}/api/user/getQrCode`, {
+    fetchWithAuth(`${BACKEND_URL}/api/user/qrcode`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -28,6 +29,7 @@ function StudentDashboard() {
         return response.json();
       })
       .then((data) => {
+        setHostelName(data.hostel_name);
         setQrCode(data.qrCode);
         setLoading(false);
       })
@@ -54,7 +56,7 @@ function StudentDashboard() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto px-4 py-6 sm:px-6 lg:px-8 max-w-5xl">
       <div className="border-2 border-blue-600 bg-white rounded-xl shadow-lg p-4 sm:p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex items-center justify-center">
@@ -83,7 +85,7 @@ function StudentDashboard() {
                 {user.admission_no}
               </p>
               <p className="text-gray-800 break-words">
-                <span className="font-medium">Hostel:</span> {user.hostel_name}
+                <span className="font-medium">Hostel: </span> {hostel_name}
               </p>
             </div>
           </div>
