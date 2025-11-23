@@ -67,7 +67,7 @@ export default function Poll() {
         end_time: endTime,
       };
 
-      const response = await fetchWithAuth(`${BACKEND_URL}/api/user/addpolls`, {
+      const response = await fetchWithAuth(`${BACKEND_URL}/api/user/polls`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
