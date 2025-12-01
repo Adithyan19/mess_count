@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../../hooks/useAuth";
-import { Check, Loader, ArrowLeft } from "lucide-react";
+import { Check, Loader } from "lucide-react";
 import { BACKEND_URL } from "../../../utils/api.js";
 
 function Vote() {
@@ -139,12 +139,10 @@ function Vote() {
                   <div className="p-6 space-y-3">
                     {poll.options &&
                       poll.options.map((option) => {
-                        const percentage =
-                          totalVotes > 0
-                            ? ((option.votes || 0) / totalVotes) * 100
-                            : 0;
+                        const voteCount = option.votes || 0;
                         const isUserVote = userVotedOptionId === option.id;
                         const isVoting = submitting[poll.id];
+
                         return (
                           <button
                             key={option.id}
@@ -181,7 +179,8 @@ function Vote() {
                                       : "text-gray-500"
                                   }`}
                                 >
-                                  {percentage.toFixed(0)}%
+                                  {voteCount}{" "}
+                                  {voteCount === 1 ? "vote" : "votes"}
                                 </span>
                               </div>
                             </div>
@@ -189,16 +188,13 @@ function Vote() {
                         );
                       })}
                   </div>
-                  {/* Footer Button */}
                   <div className="px-6 pb-6">
-                    <button
-                      disabled={submitting[poll.id]}
-                      onClick={() => {}}
-                      className={`w-full py-4 rounded-xl font-bold text-lg shadow-md transition-all flex items-center justify-center gap-2 ${
-                        userVotedOptionId
-                          ? "bg-blue-400 text-white hover:shadow-lg"
-                          : "bg-blue-400 text-white hover:shadow-lg"
-                      } ${submitting[poll.id] ? "opacity-70 cursor-not-allowed" : ""}`}
+                    <p
+                      className={`w-full py-4 font-bold text-md transition-all flex items-center justify-center gap-2 bg-white text-blue-400 ${
+                        submitting[poll.id]
+                          ? "opacity-70 cursor-not-allowed"
+                          : ""
+                      }`}
                     >
                       {submitting[poll.id] ? (
                         <>
@@ -210,7 +206,7 @@ function Vote() {
                       ) : (
                         "Click an option to vote!"
                       )}
-                    </button>
+                    </p>
                   </div>
                   <div className="px-6 pb-6 flex justify-between text-gray-500 text-sm">
                     <p>
